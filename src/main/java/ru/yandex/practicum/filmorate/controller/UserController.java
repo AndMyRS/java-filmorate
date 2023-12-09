@@ -50,11 +50,6 @@ public class UserController {
     }
 
     public static void validateUser(User user) {
-        if (!user.getEmail().contains("@") | user.getEmail().isBlank() | user.getLogin().isBlank() |
-        user.getLogin().contains(" ") | user.getBirthday().isAfter(LocalDate.now())) {
-            log.info("Validation failed");
-            throw new ValidationException("Invalid user data: please check all fields");
-        }
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }

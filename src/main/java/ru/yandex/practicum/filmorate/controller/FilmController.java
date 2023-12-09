@@ -51,11 +51,9 @@ public class FilmController {
     }
 
     public static void validateFilm(Film film) {
-        if (film.getName().isBlank() | film.getDescription().length() > 200 |
-        film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28)) |
-        film.getDuration() < 0) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             log.info("Validation failed");
-            throw new ValidationException("Invalid film data: please check all fields");
+            throw new ValidationException("Invalid film data: please check release date");
         }
     }
 }
