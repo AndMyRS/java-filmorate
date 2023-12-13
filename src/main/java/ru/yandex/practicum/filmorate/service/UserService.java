@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -78,11 +79,10 @@ public class UserService {
 
     public List<User> getAllFriends(int id) {
         Set<Integer> friendIds = userStorage.getUserById(id).getFriends();
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId : friendIds) {
-            User friend = userStorage.getUserById(friendId);
-            friends.add(friend);
-        }
-        return friends;
+        List<User> allUsers = userStorage.getAllUsers();
+
+        return allUsers.stream()
+                .filter(u -> friendIds.contains(u.getId()))
+                .collect(Collectors.toList());
     }
 }
