@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.time.LocalDate;
 import java.util.*;
 
-@Component
+@Component("inMemoryFilmStorage")
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     private int id = 0;
@@ -42,6 +44,41 @@ public class InMemoryFilmStorage implements FilmStorage {
             films.put(film.getId(), film);
             return film;
         } else throw new RuntimeException("No such film in filmorate");
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return null;
+    }
+
+    @Override
+    public Genre getGenreById(int id) {
+        return null;
+    }
+
+    @Override
+    public void addLikeToFilm(int filmId, int userId) {
+
+    }
+
+    @Override
+    public void deleteLikeFromFilm(int filmId, int userId) {
+
+    }
+
+    @Override
+    public List<Film> getMostPopularFilms(int count) {
+        return null;
+    }
+
+    @Override
+    public MPA getMpaById(int id) {
+        return null;
+    }
+
+    @Override
+    public List<MPA> getAllMpa() {
+        return null;
     }
 
     public static void validateFilm(Film film) {

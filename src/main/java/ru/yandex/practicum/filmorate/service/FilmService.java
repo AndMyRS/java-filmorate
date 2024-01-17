@@ -1,35 +1,33 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
 
-    public void addLike(int film, int id) { // Добавление в фильм лайка по id пользователя
-        filmStorage.getFilmById(film).getLikes().add(id);
-        updateFilm(getFilmById(id));
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
     }
 
-    public void deleteLike(int film, int id) { // Удаление из фильма лайка по id пользователя
-        filmStorage.getFilmById(film).getLikes().remove(id);
-        updateFilm(getFilmById(id));
+    public void addLike(int filmId, int userId) { // Добавление в фильм лайка по id пользователя
+        filmStorage.addLikeToFilm(filmId, userId);
     }
 
-    public List<Film> getMostPopularFilms(int filmsToShow) { // Список самых популярных фильмов. Кол-во в filmsToShow
-        return filmStorage.getAllFilms().stream()
-                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
-                .limit(filmsToShow)
-                .collect(Collectors.toList());
+    public void deleteLike(int filmId, int userId) { // Удаление из фильма лайка по id пользователя
+        filmStorage.deleteLikeFromFilm(filmId, userId);
+    }
+
+    public List<Film> getMostPopularFilms(int filmsToShow) {
+        return filmStorage.getMostPopularFilms(filmsToShow);
     }
 
     public List<Film> getAllFilms() {
@@ -46,5 +44,21 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         return filmStorage.updateFilm(film);
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    public Genre getGenreById(int id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public MPA getMpaById(int id) {
+        return filmStorage.getMpaById(id);
+    }
+
+    public List<MPA> getAllMpa() {
+        return filmStorage.getAllMpa();
     }
 }
