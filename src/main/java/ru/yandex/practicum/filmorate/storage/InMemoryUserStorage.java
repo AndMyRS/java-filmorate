@@ -43,6 +43,21 @@ public class InMemoryUserStorage implements UserStorage {
         } else throw new RuntimeException("No such user in filmorate");
     }
 
+    @Override
+    public List<User> getFriendsOfUser(int id) {
+        return null;
+    }
+
+    @Override
+    public void addToFriends(int id, int friendId) {
+
+    }
+
+    @Override
+    public void deleteFromFriends(int id, int friendId) {
+
+    }
+
     public static void validateUser(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
