@@ -136,7 +136,7 @@ public class FilmDbStorage implements FilmStorage {
                     return genreIds.size();
                 }
             });
-
+        }
         return film;
     }
 
