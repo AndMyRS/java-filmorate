@@ -124,10 +124,18 @@ public class FilmDbStorage implements FilmStorage {
                 genreIds.add(genre.getId());
             }
 
-            for (Integer genreId : genreIds) {
-                jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", id, genreId);
-            }
-        }
+            jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, id);
+                    ps.setInt(2, genreIds.get(i));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return genreIds.size();
+                }
+            });
 
         return film;
     }
@@ -147,9 +155,18 @@ public class FilmDbStorage implements FilmStorage {
 
                 jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", id);
 
-                for (Integer genreId : genreIds) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", id, genreId);
-                }
+                jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, genreIds.get(i));
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return genreIds.size();
+                    }
+                });
             }
             return film;
         } else throw new IllegalArgumentException("No such film in filmorate");
