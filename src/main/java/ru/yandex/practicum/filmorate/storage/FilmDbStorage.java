@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -124,9 +126,18 @@ public class FilmDbStorage implements FilmStorage {
                 genreIds.add(genre.getId());
             }
 
-            for (Integer genreId : genreIds) {
-                jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", id, genreId);
-            }
+            jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, id);
+                    ps.setInt(2, genreIds.get(i));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return genreIds.size();
+                }
+            });
         }
 
         return film;
@@ -145,11 +156,30 @@ public class FilmDbStorage implements FilmStorage {
                     genreIds.add(genre.getId());
                 }
 
-                jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", id);
+                jdbcTemplate.batchUpdate("DELETE FROM film_genres WHERE film_id = ?", new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                    }
 
-                for (Integer genreId : genreIds) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", id, genreId);
-                }
+                    @Override
+                    public int getBatchSize() {
+                        return genreIds.size();
+                    }
+                });
+
+                jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, id);
+                        ps.setInt(2, genreIds.get(i));
+                    }
+
+                    @Override
+                    public int getBatchSize() {
+                        return genreIds.size();
+                    }
+                });
             }
             return film;
         } else throw new IllegalArgumentException("No such film in filmorate");

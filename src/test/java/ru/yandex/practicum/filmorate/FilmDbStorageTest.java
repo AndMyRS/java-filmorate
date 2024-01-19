@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,11 +28,13 @@ public class FilmDbStorageTest {
                 .description("Film1 description")
                 .releaseDate(LocalDate.of(2020, 01, 01))
                 .duration(90)
+                .likes(new HashSet<>())
+                .genres(new LinkedHashSet<>())
                 .mpa(MPA.builder()
                         .id(1)
-                        .name("MPA1")
+                        .name("G")
                         .build())
-                .rate(5)
+                .rate(0)
                 .build();
 
         FilmDbStorage filmDbStorage = new FilmDbStorage(jdbcTemplate);
