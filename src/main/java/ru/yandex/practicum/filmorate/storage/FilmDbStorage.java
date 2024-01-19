@@ -156,17 +156,7 @@ public class FilmDbStorage implements FilmStorage {
                     genreIds.add(genre.getId());
                 }
 
-                jdbcTemplate.batchUpdate("DELETE FROM film_genres WHERE film_id = ?", new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, id);
-                    }
-
-                    @Override
-                    public int getBatchSize() {
-                        return genreIds.size();
-                    }
-                });
+                jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", id);
 
                 jdbcTemplate.batchUpdate("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", new BatchPreparedStatementSetter() {
                     @Override
