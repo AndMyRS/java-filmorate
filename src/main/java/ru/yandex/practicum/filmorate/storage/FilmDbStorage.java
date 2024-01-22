@@ -139,7 +139,6 @@ public class FilmDbStorage implements FilmStorage {
                 }
             });
         }
-
         return film;
     }
 
