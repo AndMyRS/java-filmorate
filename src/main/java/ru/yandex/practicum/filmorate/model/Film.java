@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Data
-@Builder(access = AccessLevel.PUBLIC)
+@Builder
 public class Film {
 
     private int id;
