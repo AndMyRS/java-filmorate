@@ -1,88 +1,67 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class UserService {
 
     private UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) { // Использование @Primary ?
         this.userStorage = userStorage;
     }
 
     public void addToFriends(int id, int friendId) {
-        User firstUser = userStorage.getUserById(id);
-        User secondUser = userStorage.getUserById(friendId);
-
-        Set<Integer> firstUserFriends = firstUser.getFriends();
-        Set<Integer> secondUserFriends = secondUser.getFriends();
-
-        firstUserFriends.add(friendId);
-        secondUserFriends.add(id);
-
-        userStorage.getUserById(id).setFriends(firstUserFriends);
-        userStorage.getUserById(friendId).setFriends(secondUserFriends);
-
-        updateUser(firstUser);
-        updateUser(secondUser);
-
+        log.info("Add friend to user with id {}", id);
+        userStorage.addToFriends(id, friendId);
     }
 
     public void deleteFromFriends(int id, int friendId) {
-        User user = userStorage.getUserById(id);
-        Set<Integer> friends = user.getFriends();
-        friends.remove(friendId);
-        user.setFriends(friends);
-        updateUser(user);
+        log.info("Delete friend by user with id {}", id);
+        userStorage.deleteFromFriends(id, friendId);
     }
 
     public List<User> getCommonFriends(int id, int otherId) {
-        Set<Integer> user1Friends = userStorage.getUserById(id).getFriends();
-        Set<Integer> user2Friends = userStorage.getUserById(otherId).getFriends();
-        Set<Integer> commonFriends = new HashSet<>();
-        commonFriends.addAll(user1Friends);
-        commonFriends.retainAll(user2Friends);
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId : commonFriends) {
-            User friend = userStorage.getUserById(friendId);
-            friends.add(friend);
-        }
-        return friends;
+        log.info("Get common friends for users with id {} and {}", id, otherId);
+        List<User> friendsUser1 = userStorage.getFriendsOfUser(id);
+        List<User> friendsUser2 = userStorage.getFriendsOfUser(otherId);
+
+        friendsUser1.retainAll(friendsUser2);
+
+        return friendsUser1;
     }
 
     public List<User> getAllUsers() {
+        log.info("Get all users");
         return userStorage.getAllUsers();
     }
 
     public User getUserById(int id) {
+        log.info("Get user with id {}", id);
         return userStorage.getUserById(id);
     }
 
     public User addUser(User user) {
+        log.info("Add user {}", user);
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) {
+        log.info("Update user {}", user);
         return userStorage.updateUser(user);
     }
 
     public List<User> getAllFriends(int id) {
-        Set<Integer> friendIds = userStorage.getUserById(id).getFriends();
-        List<User> allUsers = userStorage.getAllUsers();
-
-        return allUsers.stream()
-                .filter(u -> friendIds.contains(u.getId()))
-                .collect(Collectors.toList());
+        log.info("Get all friends of user with id {}", id);
+        return userStorage.getFriendsOfUser(id);
     }
 }
